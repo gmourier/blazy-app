@@ -71,7 +71,7 @@ export default function Home() {
                   Hi, I'm Blazy.
                 </p>
                 <p className="mt-6 text-lg leading-8 text-gray-600">
-                  I spent sometime studying Meilisearch's documentation and I'm ready to answer your questions.
+                  I spent some time studying Meilisearch's documentation and I'm ready to answer your questions.
                 </p>
               </div>
             </div>
