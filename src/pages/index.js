@@ -4,6 +4,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
+  const [sources, setSources] = useState([]);
 
   const handleChange = (event) => {
     setQuestion(event.target.value);
@@ -20,10 +21,11 @@ export default function Home() {
 		try {
       setLoading(true);
       setAnswer('');
+      setSources([]);
 			const res = await fetch(`https://blazy.up.railway.app?question="${question}"`, settings)
 			const data = await res.json();
-			console.log(data);
       setAnswer(data.answer)
+      setSources(data.sources.filter((str) => str !== ""))
       setLoading(false);
 		} catch (err) {
 			console.log(err);
@@ -82,6 +84,17 @@ export default function Home() {
               <div className="answer">
                 {answer}
               </div>
+
+              {sources && sources.length > 0 &&
+                <div>
+                  <p className="mt-10 text-sm text-gray-500">Sources:</p>
+                  <span>
+                    {sources.map((ref, i) =>
+                      <a key={i} className="mt-2 text-xs text-gray-500 mr-2" target="_blank" href={ref}>{ref.split('/').pop()}</a>
+                    )}
+                  </span>
+                </div>
+              }
             </div>
 
             <div className="mt-1">
@@ -94,7 +107,6 @@ export default function Home() {
                 id="question"
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 defaultValue={''}
-                autocomplete="off"
                 onChange={handleChange}
               />
             </div>
