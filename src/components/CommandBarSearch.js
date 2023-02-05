@@ -1,8 +1,9 @@
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect } from "react";
 import { Combobox, Dialog, Transition } from "@headlessui/react";
 import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
 import {
   ExclamationTriangleIcon,
+  ChatBubbleOvalLeftEllipsisIcon,
   BookOpenIcon,
 } from "@heroicons/react/24/outline";
 import CommandBarFooter from "@/components/CommandBarFooter";
@@ -13,7 +14,8 @@ function classNames(...classes) {
 }
 
 export default function CommandBarSearch() {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [status, setStatus] = useState("search");
   const [query, setQuery] = useState("");
   const [data, setData] = useState({});
 
@@ -39,6 +41,32 @@ export default function CommandBarSearch() {
     setData(response);
     setQuery(query);
   };
+
+  useEffect(() => {
+    const onKeydown = (e) => {
+      if ((e.key === "k" || e.key === "/") && (e.metaKey || e.ctrlKey)) {
+        if (e.key === "/") {
+          if (status === "ask") {
+            setOpen(!open);
+          } else {
+            setStatus("ask");
+          }
+        } else {
+          if (status === "search") {
+            setOpen(!open);
+          } else {
+            setStatus("search");
+          }
+        }
+        e.preventDefault();
+        setQuery("");
+      }
+    };
+    window.addEventListener("keydown", onKeydown);
+    return () => {
+      window.removeEventListener("keydown", onKeydown);
+    };
+  }, [open, status]);
 
   return (
     <Transition.Root
@@ -73,15 +101,33 @@ export default function CommandBarSearch() {
             <Dialog.Panel className="mx-auto max-w-2xl transform divide-y divide-gray-500 divide-opacity-20 overflow-hidden rounded-xl bg-gray-900 shadow-2xl transition-all">
               <Combobox onChange={(item) => (window.location = item.url)}>
                 <div className="relative">
-                  <MagnifyingGlassIcon
-                    className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-500"
-                    aria-hidden="true"
-                  />
-                  <Combobox.Input
-                    className="h-12 w-full border-0 bg-transparent pl-11 pr-4 text-white placeholder-gray-500 focus:ring-0 sm:text-sm"
-                    placeholder="Search..."
-                    onChange={(event) => search(event.target.value)}
-                  />
+                  {console.log(status)}
+                  {status === "search" && (
+                    <>
+                      <MagnifyingGlassIcon
+                        className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-500"
+                        aria-hidden="true"
+                      />
+                      <Combobox.Input
+                        className="h-12 w-full border-0 bg-transparent pl-11 pr-4 text-white placeholder-gray-500 focus:ring-0 sm:text-sm"
+                        placeholder="Search..."
+                        onChange={(event) => search(event.target.value)}
+                      />
+                    </>
+                  )}
+                  {status === "ask" && (
+                    <>
+                      <ChatBubbleOvalLeftEllipsisIcon
+                        className="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-gray-500"
+                        aria-hidden="true"
+                      />
+                      <Combobox.Input
+                        className="h-12 w-full border-0 bg-transparent pl-11 pr-4 text-white placeholder-gray-500 focus:ring-0 sm:text-sm"
+                        placeholder="Ask..."
+                        onChange={(event) => ask(event.target.value)}
+                      />
+                    </>
+                  )}
                 </div>
                 {Object.keys(data).length !== 0 && (
                   <Combobox.Options
