@@ -83,12 +83,14 @@ export default function CommandBar() {
             setOpen(!open);
           } else {
             setStatus("ask");
+            setOpen(true);
           }
         } else {
           if (status === "search") {
             setOpen(!open);
           } else {
             setStatus("search");
+            setOpen(true);
           }
         }
         e.preventDefault();
