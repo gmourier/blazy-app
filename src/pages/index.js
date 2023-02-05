@@ -1,5 +1,5 @@
 import { useState } from "react";
-import CommandBar from "@/components/CommandBar";
+import CommandBarSearch from "@/components/CommandBarSearch";
 
 export default function Home() {
   const [loading, setLoading] = useState(false);
@@ -82,7 +82,7 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <CommandBar />
+          <CommandBarSearch />
 
           <div>
             <div className="mt-1 mb-10 block w-full rounded-md border-gray-200 sm:text-md">
