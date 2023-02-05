@@ -9,8 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@heroicons/react": "^1.0.6",
+    "@headlessui/react": "^1.7.9",
+    "@heroicons/react": "^2.0.14",
     "@next/font": "13.1.6",
+    "meilisearch": "^0.30.0",
     "next": "13.1.6",
     "react": "18.2.0",
     "react-dom": "18.2.0"

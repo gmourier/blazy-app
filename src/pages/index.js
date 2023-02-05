@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState } from "react";
+import CommandBar from "@/components/CommandBar";
 
 export default function Home() {
   const [loading, setLoading] = useState(false);
-  const [question, setQuestion] = useState('');
-  const [answer, setAnswer] = useState('');
+  const [question, setQuestion] = useState("");
+  const [answer, setAnswer] = useState("");
   const [sources, setSources] = useState([]);
 
   const handleChange = (event) => {
@@ -11,32 +12,34 @@ export default function Home() {
   };
 
   const ask = async () => {
-
     const settings = {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Access-Control-Allow-Origin': '*',
+        "Access-Control-Allow-Origin": "*",
       },
-    }
-		try {
+    };
+    try {
       setLoading(true);
-      setAnswer('');
+      setAnswer("");
       setSources([]);
-			const res = await fetch(`https://blazy.up.railway.app?question="${question}"`, settings)
-			const data = await res.json();
-      setAnswer(data.answer)
-      setSources(data.sources.filter((str) => str !== ""))
+      const res = await fetch(
+        `https://blazy.up.railway.app?question="${question}"`,
+        settings
+      );
+      const data = await res.json();
+      setAnswer(data.answer);
+      setSources(data.sources.filter((str) => str !== ""));
       setLoading(false);
-		} catch (err) {
-			console.log(err);
+    } catch (err) {
+      console.log(err);
       setLoading(false);
-		}
+    }
   };
 
   const navigation = [
     {
-      name: 'Twitter',
-      href: 'https://twitter.com/meilisearch',
+      name: "Twitter",
+      href: "https://twitter.com/meilisearch",
       icon: (props) => (
         <svg fill="currentColor" viewBox="0 0 24 24" {...props}>
           <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
@@ -44,8 +47,8 @@ export default function Home() {
       ),
     },
     {
-      name: 'GitHub',
-      href: 'https://github.com/meilisearch/meilisearch',
+      name: "GitHub",
+      href: "https://github.com/meilisearch/meilisearch",
       icon: (props) => (
         <svg fill="currentColor" viewBox="0 0 24 24" {...props}>
           <path
@@ -55,50 +58,60 @@ export default function Home() {
           />
         </svg>
       ),
-    }
-  ]
+    },
+  ];
 
-	return (
+  return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       {/* We've used 3xl here, but feel free to try other max-widths based on your needs */}
       <div className="mx-auto max-w-3xl">
-
         <main className="main">
-
           <div className="bg-white py-24 sm:py-32">
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
               <div className="mx-auto max-w-2xl lg:text-center">
-                <h2 className="text-lg font-semibold leading-8 tracking-tight text-indigo-500 mb-5">🧪 Work In Progress</h2>
+                <h2 className="text-lg font-semibold leading-8 tracking-tight text-indigo-500 mb-5">
+                  🧪 Work In Progress
+                </h2>
                 <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
                   Hi, I'm Blazy.
                 </p>
                 <p className="mt-6 text-lg leading-8 text-gray-600">
-                  I spent some time studying Meilisearch's documentation and I'm ready to answer your questions.
+                  I spent some time studying Meilisearch's documentation and I'm
+                  ready to answer your questions.
                 </p>
               </div>
             </div>
           </div>
+          <CommandBar />
 
           <div>
             <div className="mt-1 mb-10 block w-full rounded-md border-gray-200 sm:text-md">
-              <div className="answer">
-                {answer}
-              </div>
+              <div className="answer">{answer}</div>
 
-              {sources && sources.length > 0 &&
+              {sources && sources.length > 0 && (
                 <div>
                   <p className="mt-10 text-sm text-gray-500">Sources:</p>
                   <span>
-                    {sources.map((ref, i) =>
-                      <a key={i} className="mt-2 text-xs text-gray-500 mr-2" target="_blank" href={ref}>{ref.split('/').pop()}</a>
-                    )}
+                    {sources.map((ref, i) => (
+                      <a
+                        key={i}
+                        className="mt-2 text-xs text-gray-500 mr-2"
+                        target="_blank"
+                        href={ref}
+                      >
+                        {ref.split("/").pop()}
+                      </a>
+                    ))}
                   </span>
                 </div>
-              }
+              )}
             </div>
 
             <div className="mt-1">
-              <label htmlFor="question" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="question"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Ask me anything about <strong>Meilisearch!</strong>
               </label>
               <textarea
@@ -106,7 +119,7 @@ export default function Home() {
                 name="question"
                 id="question"
                 className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                defaultValue={''}
+                defaultValue={""}
                 onChange={handleChange}
               />
             </div>
@@ -125,7 +138,11 @@ export default function Home() {
           <div className="mx-auto max-w-7xl py-12 px-6 md:flex md:items-center md:justify-between lg:px-8">
             <div className="flex content-evenly space-x-6 md:order-2">
               {navigation.map((item) => (
-                <a key={item.name} href={item.href} className="text-gray-400 hover:text-gray-500">
+                <a
+                  key={item.name}
+                  href={item.href}
+                  className="text-gray-400 hover:text-gray-500"
+                >
                   <span className="sr-only">{item.name}</span>
                   <item.icon className="h-6 w-6" aria-hidden="true" />
                 </a>
@@ -140,5 +157,5 @@ export default function Home() {
         </footer>
       </div>
     </div>
-	);
+  );
 }
