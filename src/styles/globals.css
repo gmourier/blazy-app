@@ -1,3 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.answer a {
+    @apply text-gray-500;
+    text-decoration: underline;
+    word-wrap: break-word;
+}
+
+code {
+    @apply bg-gray-500;
+    @apply text-gray-100;
+    @apply rounded;
+    padding: 0.2rem;
+}

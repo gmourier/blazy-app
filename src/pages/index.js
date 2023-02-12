@@ -1,4 +1,9 @@
 import { useState } from 'react';
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+
+import { ExclamationTriangleIcon } from '@heroicons/react/20/solid'
+import { FaMagic } from 'react-icons/fa';
 
 export default function Home() {
   const [loading, setLoading] = useState(false);
@@ -13,20 +18,28 @@ export default function Home() {
   const ask = async () => {
 
     const settings = {
-      method: 'POST',
+      method: 'GET',
       headers: {
         'Access-Control-Allow-Origin': '*',
       },
     }
+
 		try {
       setLoading(true);
       setAnswer('');
       setSources([]);
-			const res = await fetch(`https://blazy.up.railway.app?question="${question}"`, settings)
-			const data = await res.json();
-      setAnswer(data.answer)
-      setSources(data.sources.filter((str) => str !== ""))
-      setLoading(false);
+
+      if (question === '') {
+        setLoading(false);
+        setAnswer('Uh oh, ask me a question. 🤔');
+      }
+      else {
+        const res = await fetch(`https://blazy.up.railway.app?question="${question}"`, settings)
+        const data = await res.json();
+        setAnswer(data.answer)
+        setSources(data.sources.filter((str) => str !== ""))
+        setLoading(false);
+      }
 		} catch (err) {
 			console.log(err);
       setLoading(false);
@@ -59,53 +72,52 @@ export default function Home() {
   ]
 
 	return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      {/* We've used 3xl here, but feel free to try other max-widths based on your needs */}
-      <div className="mx-auto max-w-3xl">
-
+    <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8">
         <main className="main">
-
           <div className="bg-white py-24 sm:py-32">
-            <div className="mx-auto max-w-7xl px-6 lg:px-8">
-              <div className="mx-auto max-w-2xl lg:text-center">
-                <h2 className="text-lg font-semibold leading-8 tracking-tight text-indigo-500 mb-5">🧪 Work In Progress</h2>
+            <div className="mx-auto px-6 lg:px-8">
+              <div className="mx-auto max-w-2xl">
                 <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                  Hi, I'm Blazy.
+                  Hi.
                 </p>
                 <p className="mt-6 text-lg leading-8 text-gray-600">
-                  I spent some time studying Meilisearch's documentation and I'm ready to answer your questions.
+                  Ask me anything about Meilisearch.
                 </p>
               </div>
             </div>
           </div>
 
+
           <div>
-            <div className="mt-1 mb-10 block w-full rounded-md border-gray-200 sm:text-md">
-              <div className="answer">
-                {answer}
-              </div>
-
-              {sources && sources.length > 0 &&
-                <div>
-                  <p className="mt-10 text-sm text-gray-500">Sources:</p>
-                  <span>
-                    {sources.map((ref, i) =>
-                      <a key={i} className="mt-2 text-xs text-gray-500 mr-2" target="_blank" href={ref}>{ref.split('/').pop()}</a>
-                    )}
-                  </span>
+            {answer && answer.length > 0 &&
+              <div className="mt-1 mb-10 block w-full rounded-md p-5 text-gray-600 bg-gray-100 border-gray-200 text-sm sm:text-md">
+                <div className="answer leading-6">
+                  <ReactMarkdown children={answer} remarkPlugins={[remarkGfm]} />
                 </div>
-              }
-            </div>
 
+                {sources && sources.length > 0 &&
+                  <div>
+                    <p className="mt-12 text-sm text-gray-500"><strong>Sources:</strong></p>
+                    <span>
+                      {sources.map((source, i) =>
+                        <span className="mr-2">
+                          <a key={i} className="mt-2 text-xs text-gray-500 mr-1" target="_blank" href={source.url}>{source.url.split('/').pop()}</a>
+                          <span className="inline-flex items-center rounded bg-gray-300 px-1 py-1 text-xs font-medium text-gray-500">
+                            {source.score}
+                          </span>
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                }
+              </div>
+            }
             <div className="mt-1">
-              <label htmlFor="question" className="block text-sm font-medium text-gray-700 mb-1">
-                Ask me anything about <strong>Meilisearch!</strong>
-              </label>
               <textarea
                 rows={4}
                 name="question"
                 id="question"
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                className="block w-full rounded-md border-gray-200 focus:border-indigo-300 focus:ring-indigo-300 sm:text-sm"
                 defaultValue={''}
                 onChange={handleChange}
               />
@@ -114,31 +126,46 @@ export default function Home() {
 
           <button
             type="button"
-            className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-4 mb-4"
+            className="inline-flex items-center rounded-md border border-transparent bg-indigo-500 px-6 py-3 text-base font-medium text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-4 mb-4"
             onClick={ask}
           >
-            {loading ? <>Bipbop...</> : <>Ask</>}
+            {loading ? <>Bipbop...</> : <><FaMagic/>&nbsp;Ask</>}
           </button>
+
+          <div className="rounded-md bg-yellow-50 p-4 mt-8">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <ExclamationTriangleIcon className="h-5 w-5 text-yellow-400" aria-hidden="true" />
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-yellow-800">Attention needed</h3>
+                <div className="mt-2 text-sm text-yellow-700">
+                  <p>
+                    Answers are provided by a large language model. They are not always accurate and sometimes can be completely wrong. Don't take them too seriously.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </main>
 
         <footer className="bg-white border-t border-gray-900/10 mt-10">
-          <div className="mx-auto max-w-7xl py-12 px-6 md:flex md:items-center md:justify-between lg:px-8">
-            <div className="flex content-evenly space-x-6 md:order-2">
+          <div className="mx-auto max-w-7xl py-6 px-6 md:flex md:items-center md:justify-between lg:px-8">
+            <div className="flex content-evenly space-x-4 md:order-2">
               {navigation.map((item) => (
                 <a key={item.name} href={item.href} className="text-gray-400 hover:text-gray-500">
                   <span className="sr-only">{item.name}</span>
-                  <item.icon className="h-6 w-6" aria-hidden="true" />
+                  <item.icon className="h-4 w-4" aria-hidden="true" />
                 </a>
               ))}
             </div>
             <div className="mt-8 md:order-1 md:mt-0">
-              <p className="text-center text-xs leading-5 text-gray-500">
+              <p className="text-xs text-gray-500">
                 &copy; 2023 Meilisearch
               </p>
             </div>
           </div>
         </footer>
-      </div>
     </div>
 	);
 }
