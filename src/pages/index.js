@@ -148,24 +148,6 @@ export default function Home() {
             </div>
           </div>
         </main>
-
-        <footer className="bg-white border-t border-gray-900/10 mt-10">
-          <div className="mx-auto max-w-7xl py-6 px-6 md:flex md:items-center md:justify-between lg:px-8">
-            <div className="flex content-evenly space-x-4 md:order-2">
-              {navigation.map((item) => (
-                <a key={item.name} href={item.href} className="text-gray-400 hover:text-gray-500">
-                  <span className="sr-only">{item.name}</span>
-                  <item.icon className="h-4 w-4" aria-hidden="true" />
-                </a>
-              ))}
-            </div>
-            <div className="mt-8 md:order-1 md:mt-0">
-              <p className="text-xs text-gray-500">
-                &copy; 2023 Meilisearch
-              </p>
-            </div>
-          </div>
-        </footer>
     </div>
 	);
 }
