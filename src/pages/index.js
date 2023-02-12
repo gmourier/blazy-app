@@ -75,10 +75,10 @@ export default function Home() {
     <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8">
         <main className="main">
           <div className="bg-white py-24 sm:py-32">
-            <div className="mx-auto px-6 lg:px-8">
+            <div className="mx-auto px-6 lg:px-8 flex items-center justify-center text-center">
               <div className="mx-auto max-w-2xl">
                 <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                  Hi.
+                  Yo. 🤙
                 </p>
                 <p className="mt-6 text-lg leading-8 text-gray-600">
                   Ask me anything about Meilisearch.
@@ -93,13 +93,13 @@ export default function Home() {
               <div className="mt-1 mb-10 block w-full rounded-md p-5 text-gray-600 bg-gray-100 border-gray-200 text-sm sm:text-md">
                 <div class="animate-pulse flex space-x-4">
                   <div class="flex-1 space-y-6 py-1">
-                    <div class="h-2 bg-gray-200 rounded"></div>
+                    <div class="h-2 bg-gray-300 rounded"></div>
                     <div class="space-y-3">
                       <div class="grid grid-cols-3 gap-4">
-                        <div class="h-2 bg-gray-200 rounded col-span-2"></div>
-                        <div class="h-2 bg-gray-200 rounded col-span-1"></div>
+                        <div class="h-2 bg-gray-300 rounded col-span-2"></div>
+                        <div class="h-2 bg-gray-300 rounded col-span-1"></div>
                       </div>
-                      <div class="h-2 bg-gray-200 rounded"></div>
+                      <div class="h-2 bg-gray-300 rounded"></div>
                     </div>
                   </div>
                 </div>
