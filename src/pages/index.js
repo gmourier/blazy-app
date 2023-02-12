@@ -89,6 +89,22 @@ export default function Home() {
 
 
           <div>
+            {loading &&
+              <div className="mt-1 mb-10 block w-full rounded-md p-5 text-gray-600 bg-gray-100 border-gray-200 text-sm sm:text-md">
+                <div class="animate-pulse flex space-x-4">
+                  <div class="flex-1 space-y-6 py-1">
+                    <div class="h-2 bg-gray-200 rounded"></div>
+                    <div class="space-y-3">
+                      <div class="grid grid-cols-3 gap-4">
+                        <div class="h-2 bg-gray-200 rounded col-span-2"></div>
+                        <div class="h-2 bg-gray-200 rounded col-span-1"></div>
+                      </div>
+                      <div class="h-2 bg-gray-200 rounded"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
             {answer && answer.length > 0 &&
               <div className="mt-1 mb-10 block w-full rounded-md p-5 text-gray-600 bg-gray-100 border-gray-200 text-sm sm:text-md">
                 <div className="answer leading-6">
@@ -126,10 +142,15 @@ export default function Home() {
 
           <button
             type="button"
-            className="inline-flex items-center rounded-md border border-transparent bg-indigo-500 px-6 py-3 text-base font-medium text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-4 mb-4"
+            className="inline-flex items-center rounded-md border border-transparent bg-indigo-500 px-6 py-3 text-base font-medium text-white hover:bg-indigo-600 focus:outline-none mt-4 mb-4"
             onClick={ask}
           >
-            {loading ? <>Bipbop...</> : <><FaMagic/>&nbsp;Ask</>}
+            {loading ?
+              <><div class="w-4 h-4 rounded-full animate-spin
+              border-2 border-solid border-white border-t-transparent"></div>&nbsp; Processing...</>
+            :
+              <><FaMagic/>&nbsp;Ask</>
+            }
           </button>
 
           <div className="rounded-md bg-yellow-50 p-4 mt-8">
