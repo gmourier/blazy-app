@@ -7,7 +7,7 @@ import { FaMagic } from 'react-icons/fa';
 
 export default function Home() {
 
-  const WS_URL = "ws://localhost:8000/chat";
+  const WS_URL = "ws://blazy.up.railway.app/chat";
 
   const [loading, setLoading] = useState(false);
   const [isConnectionOpen, setConnectionOpen] = useState(false);
