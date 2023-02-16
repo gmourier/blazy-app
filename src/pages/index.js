@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
@@ -6,44 +6,100 @@ import { ExclamationTriangleIcon } from '@heroicons/react/20/solid'
 import { FaMagic } from 'react-icons/fa';
 
 export default function Home() {
+
+  const WS_URL = "ws://localhost:8000/chat";
+
   const [loading, setLoading] = useState(false);
+  const [isConnectionOpen, setConnectionOpen] = useState(false);
+  const [messages, setMessages] = useState([]);
   const [question, setQuestion] = useState('');
+  const [status, setStatus] = useState('Ask me anything about Meilisearch.');
   const [answer, setAnswer] = useState('');
-  const [sources, setSources] = useState([]);
+  // const [answer, setAnswer] = useState('');
+  // const [sources, setSources] = useState([]);
+
+  const ws = useRef();
+
+  const sendMessage = () => {
+    if (question === '') {
+      return;
+    }
+    ws.current.send(question);
+    setLoading(true);
+    setAnswer('');
+  }
 
   const handleChange = (event) => {
     setQuestion(event.target.value);
   };
 
+  useEffect(() => {
+    ws.current = new WebSocket(WS_URL);
+
+    ws.current.onopen = () => {
+      console.log("Connection opened");
+      setConnectionOpen(true);
+    };
+
+    ws.current.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.sender === "bot") {
+        if (data.type === "start") {
+          setStatus("Blazy is thinking...")
+        } else if (data.type === "stream") {
+          setStatus("Blazy is typing...")
+          setAnswer((prev) => prev + data.message)
+        } else if (data.type === "info") {
+          setStatus(data.message)
+        } else if (data.type === "end") {
+          setStatus("Ask me anything about Meilisearch.")
+          setLoading(false);
+        } else if (data.type === "error") {
+          setStatus("Ask me anything about Meilisearch.")
+          setLoading(false);
+          setAnswer('')
+        }
+      } else {
+        //me getting question back. //UPDATE UI
+        return;
+      }
+    };
+
+    return () => {
+      console.log("Cleaning up...");
+      ws.current.close();
+    };
+  }, []);
+
   const ask = async () => {
 
-    const settings = {
-      method: 'GET',
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-      },
-    }
+    // const settings = {
+    //   method: 'GET',
+    //   headers: {
+    //     'Access-Control-Allow-Origin': '*',
+    //   },
+    // }
 
-		try {
-      setLoading(true);
-      setAnswer('');
-      setSources([]);
+		// try {
+    //   setLoading(true);
+    //   setAnswer('');
+    //   setSources([]);
 
-      if (question === '') {
-        setLoading(false);
-        setAnswer('Uh oh, ask me a question. 🤔');
-      }
-      else {
-        const res = await fetch(`https://blazy.up.railway.app?question="${question}"`, settings)
-        const data = await res.json();
-        setAnswer(data.answer)
-        setSources(data.sources.filter((str) => str !== ""))
-        setLoading(false);
-      }
-		} catch (err) {
-			console.log(err);
-      setLoading(false);
-		}
+    //   if (question === '') {
+    //     setLoading(false);
+    //     setAnswer('Uh oh, ask me a question. 🤔');
+    //   }
+    //   else {
+    //     const res = await fetch(`https://blazy.up.railway.app?question="${question}"`, settings)
+    //     const data = await res.json();
+    //     setAnswer(data.answer)
+    //     setSources(data.sources.filter((str) => str !== ""))
+    //     setLoading(false);
+    //   }
+		// } catch (err) {
+		// 	console.log(err);
+    //   setLoading(false);
+		// }
   };
 
   const navigation = [
@@ -81,37 +137,36 @@ export default function Home() {
                   Yo. 🤙
                 </p>
                 <p className="mt-6 text-lg leading-8 text-gray-600">
-                  Ask me anything about Meilisearch.
+                  {status}
                 </p>
               </div>
             </div>
           </div>
 
-
           <div>
-            {loading &&
+            {/* {loading && !answer &&
               <div className="mt-1 mb-10 block w-full rounded-md p-5 text-gray-600 bg-gray-100 border-gray-200 text-sm sm:text-md">
-                <div class="animate-pulse flex space-x-4">
-                  <div class="flex-1 space-y-6 py-1">
-                    <div class="h-2 bg-gray-300 rounded"></div>
-                    <div class="space-y-3">
-                      <div class="grid grid-cols-3 gap-4">
-                        <div class="h-2 bg-gray-300 rounded col-span-2"></div>
-                        <div class="h-2 bg-gray-300 rounded col-span-1"></div>
+                <div className="animate-pulse flex space-x-4">
+                  <div className="flex-1 space-y-6 py-1">
+                    <div className="h-2 bg-gray-300 rounded"></div>
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-3 gap-4">
+                        <div className="h-2 bg-gray-300 rounded col-span-2"></div>
+                        <div className="h-2 bg-gray-300 rounded col-span-1"></div>
                       </div>
-                      <div class="h-2 bg-gray-300 rounded"></div>
+                      <div className="h-2 bg-gray-300 rounded"></div>
                     </div>
                   </div>
                 </div>
               </div>
-            }
-            {answer && answer.length > 0 &&
+            } */}
+            {answer &&
               <div className="mt-1 mb-10 block w-full rounded-md p-5 text-gray-600 bg-gray-100 border-gray-200 text-sm sm:text-md">
                 <div className="answer leading-6">
-                  <ReactMarkdown children={answer} remarkPlugins={[remarkGfm]} />
+                  {<ReactMarkdown children={answer} remarkPlugins={[remarkGfm]} />}
                 </div>
 
-                {sources && sources.length > 0 &&
+                {/* {sources && sources.length > 0 &&
                   <div>
                     <p className="mt-12 text-sm text-gray-500"><strong>Sources:</strong></p>
                     <span>
@@ -125,7 +180,7 @@ export default function Home() {
                       )}
                     </span>
                   </div>
-                }
+                } */}
               </div>
             }
             <div className="mt-1">
@@ -143,10 +198,10 @@ export default function Home() {
           <button
             type="button"
             className="inline-flex items-center rounded-md border border-transparent bg-indigo-500 px-6 py-3 text-base font-medium text-white hover:bg-indigo-600 focus:outline-none mt-4 mb-4"
-            onClick={ask}
+            onClick={sendMessage}
           >
             {loading ?
-              <><div class="w-4 h-4 rounded-full animate-spin
+              <><div className="w-4 h-4 rounded-full animate-spin
               border-2 border-solid border-white border-t-transparent"></div>&nbsp; Processing...</>
             :
               <><FaMagic/>&nbsp;Ask</>
