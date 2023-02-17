@@ -2,15 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+    @apply bg-gray-900;
+}
 .answer a {
-    @apply text-gray-500;
+    @apply text-gray-800;
     text-decoration: underline;
     word-wrap: break-word;
 }
 
 code {
-    @apply bg-gray-500;
-    @apply text-gray-100;
+    @apply bg-gray-800;
+    @apply text-gray-200;
     @apply rounded;
     padding: 0.2rem;
 }

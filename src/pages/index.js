@@ -2,8 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
-import { ExclamationTriangleIcon } from '@heroicons/react/20/solid'
 import { FaMagic } from 'react-icons/fa';
+import { GiPlug, GiUnplugged } from 'react-icons/gi';
+import Alert from '../components/Alert';
 
 export default function Home() {
 
@@ -11,33 +12,63 @@ export default function Home() {
 
   const [loading, setLoading] = useState(false);
   const [isConnectionOpen, setConnectionOpen] = useState(false);
+  const [status, setStatus] = useState('Ask me anything about Meilisearch.');
   const [messages, setMessages] = useState([]);
   const [question, setQuestion] = useState('');
-  const [status, setStatus] = useState('Ask me anything about Meilisearch.');
+  const [disabled, setDisabled] = useState(false);
   const [answer, setAnswer] = useState('');
-  // const [answer, setAnswer] = useState('');
-  // const [sources, setSources] = useState([]);
 
   const ws = useRef();
-
-  const sendMessage = () => {
-    if (question === '') {
-      return;
-    }
-    ws.current.send(question);
-    setLoading(true);
-    setAnswer('');
-  }
+  const messageHistory = useRef(null);
+  const questionInput = useRef(null);
 
   const handleChange = (event) => {
     setQuestion(event.target.value);
   };
 
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+    }
+
+    if (question === '') {
+      return;
+    }
+  }
+
+  const handleKeyUp = (event) => {
+    if (event.key === 'Enter') {
+      sendMessage();
+      event.preventDefault()
+    }
+
+    if (question === '') {
+      return;
+    }
+  }
+
+  const sendMessage = () => {
+    if (question === '') {
+      return;
+    }
+
+    if (answer != '') {
+      setMessages((prev) => prev.concat({"sender": "bot", "text": answer}))
+      setAnswer('');
+    }
+
+    setMessages((prev) => prev.concat({"sender": "you", "text": question}))
+
+    ws.current.send(question);
+    setLoading(true);
+    setQuestion();
+    setDisabled(true);
+  }
+
   useEffect(() => {
     ws.current = new WebSocket(WS_URL);
 
     ws.current.onopen = () => {
-      console.log("Connection opened");
       setConnectionOpen(true);
     };
 
@@ -45,67 +76,49 @@ export default function Home() {
       const data = JSON.parse(event.data);
       if (data.sender === "bot") {
         if (data.type === "start") {
-          setStatus("Blazy is thinking...")
+          setAnswer('')
+          setQuestion('')
+          setStatus("Thinking...")
+          setDisabled(true)
         } else if (data.type === "stream") {
-          setStatus("Blazy is typing...")
+          setStatus("Typing...")
           setAnswer((prev) => prev + data.message)
+          setDisabled(true)
         } else if (data.type === "info") {
           setStatus(data.message)
         } else if (data.type === "end") {
           setStatus("Ask me anything about Meilisearch.")
           setLoading(false);
+          setDisabled(false);
         } else if (data.type === "error") {
           setStatus("Ask me anything about Meilisearch.")
           setLoading(false);
           setAnswer('')
+          setDisabled(false)
         }
-      } else {
-        //me getting question back. //UPDATE UI
-        return;
       }
+
+      // Scroll to the bottom of the chat
+      messageHistory.current?.scrollIntoView({ behavior: 'smooth' })
     };
 
     return () => {
-      console.log("Cleaning up...");
       ws.current.close();
     };
   }, []);
 
-  const ask = async () => {
+  useEffect(() => {
+    questionInput.current?.focus();
+  }, []);
 
-    // const settings = {
-    //   method: 'GET',
-    //   headers: {
-    //     'Access-Control-Allow-Origin': '*',
-    //   },
-    // }
-
-		// try {
-    //   setLoading(true);
-    //   setAnswer('');
-    //   setSources([]);
-
-    //   if (question === '') {
-    //     setLoading(false);
-    //     setAnswer('Uh oh, ask me a question. 🤔');
-    //   }
-    //   else {
-    //     const res = await fetch(`https://blazy.up.railway.app?question="${question}"`, settings)
-    //     const data = await res.json();
-    //     setAnswer(data.answer)
-    //     setSources(data.sources.filter((str) => str !== ""))
-    //     setLoading(false);
-    //   }
-		// } catch (err) {
-		// 	console.log(err);
-    //   setLoading(false);
-		// }
-  };
+  useEffect(() => {
+    messageHistory.current?.scrollIntoView({behavior: 'smooth'});
+  }, []);
 
   const navigation = [
     {
       name: 'Twitter',
-      href: 'https://twitter.com/meilisearch',
+      href: 'https://twitter.com/gmourier',
       icon: (props) => (
         <svg fill="currentColor" viewBox="0 0 24 24" {...props}>
           <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
@@ -114,7 +127,7 @@ export default function Home() {
     },
     {
       name: 'GitHub',
-      href: 'https://github.com/meilisearch/meilisearch',
+      href: 'https://github.com/gmourier',
       icon: (props) => (
         <svg fill="currentColor" viewBox="0 0 24 24" {...props}>
           <path
@@ -128,99 +141,71 @@ export default function Home() {
   ]
 
 	return (
-    <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8">
+    <div className="bg-gray-900 mx-auto max-w-2xl px-4 sm:px-6 lg:px-8">
         <main className="main">
-          <div className="bg-white py-24 sm:py-32">
-            <div className="mx-auto px-6 lg:px-8 flex items-center justify-center text-center">
-              <div className="mx-auto max-w-2xl">
-                <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                  Yo. 🤙
-                </p>
-                <p className="mt-6 text-lg leading-8 text-gray-600">
-                  {status}
-                </p>
-              </div>
-            </div>
+          <Alert />
+
+          <div className="overflow-auto scrollbar-hide" style={{maxHeight: '800px'}}>
+              {messages.map((message, i) =>
+                <>
+                  { message.sender === "you" &&
+                    <div className="mt-1 mb-5 block w-4/5 text-white bg-gradient-to-r from-purple-500 to-pink-500 font-medium rounded-lg text-sm px-5 py-2.5">
+                      <p>{message.text}</p>
+                    </div>
+                  }
+                  { message.sender === "bot" &&
+                    <div className="mt-1 mb-10 block w-4/5 ml-auto text-white bg-gradient-to-br from-pink-500 to-orange-400 font-medium rounded-lg text-sm px-5 py-2.5">
+                      <p className="answer leading-6">{<ReactMarkdown children={message.text} remarkPlugins={[remarkGfm]} />}</p>
+                    </div>
+                  }
+                </>
+              )}
+              {answer &&
+                <div className="mt-1 mb-10 block w-4/5 ml-auto text-white bg-gradient-to-br from-pink-500 to-orange-400 font-medium rounded-lg text-sm px-5 py-2.5">
+                  <p className="answer leading-6"><ReactMarkdown children={answer} remarkPlugins={[remarkGfm]} /></p>
+                </div>
+              }
+              <div className="mt-8" ref={messageHistory} />
           </div>
 
-          <div>
-            {/* {loading && !answer &&
-              <div className="mt-1 mb-10 block w-full rounded-md p-5 text-gray-600 bg-gray-100 border-gray-200 text-sm sm:text-md">
-                <div className="animate-pulse flex space-x-4">
-                  <div className="flex-1 space-y-6 py-1">
-                    <div className="h-2 bg-gray-300 rounded"></div>
-                    <div className="space-y-3">
-                      <div className="grid grid-cols-3 gap-4">
-                        <div className="h-2 bg-gray-300 rounded col-span-2"></div>
-                        <div className="h-2 bg-gray-300 rounded col-span-1"></div>
-                      </div>
-                      <div className="h-2 bg-gray-300 rounded"></div>
-                    </div>
-                  </div>
+          <div className="fixed inset-x-0 bottom-8 mx-auto max-w-2xl">
+            <div className="mt-4">
+              <div className="flex mb-2">
+                <div className="text-gray-700 text-right mr-auto font-semibold text-xs sm:text-md">
+                  {isConnectionOpen ?
+                    <span className="text-green-500 inline-flex"><GiPlug />&nbsp;Connected</span>
+                  :
+                   <span className="text-gray-500 inline-flex"><GiUnplugged />&nbsp;Disconnected</span>
+                  }
                 </div>
+                <div className="text-gray-400 text-right ml-auto font-semibold text-sm sm:text-md">{status}</div>
               </div>
-            } */}
-            {answer &&
-              <div className="mt-1 mb-10 block w-full rounded-md p-5 text-gray-600 bg-gray-100 border-gray-200 text-sm sm:text-md">
-                <div className="answer leading-6">
-                  {<ReactMarkdown children={answer} remarkPlugins={[remarkGfm]} />}
-                </div>
-
-                {/* {sources && sources.length > 0 &&
-                  <div>
-                    <p className="mt-12 text-sm text-gray-500"><strong>Sources:</strong></p>
-                    <span>
-                      {sources.map((source, i) =>
-                        <span className="mr-2">
-                          <a key={i} className="mt-2 text-xs text-gray-500 mr-1" target="_blank" href={source.url}>{source.url.split('/').pop()}</a>
-                          <span className="inline-flex items-center rounded bg-gray-300 px-1 py-1 text-xs font-medium text-gray-500">
-                            {source.score}
-                          </span>
-                        </span>
-                      )}
-                    </span>
-                  </div>
-                } */}
-              </div>
-            }
-            <div className="mt-1">
               <textarea
                 rows={4}
                 name="question"
                 id="question"
-                className="block w-full rounded-md border-gray-200 focus:border-indigo-300 focus:ring-indigo-300 sm:text-sm"
+                className="block w-full rounded-md dark:bg-gray-800 border-gray-700 text-white focus:border-purple-500 focus:to-pink-500 focus:ring-purple-500 sm:text-sm"
                 defaultValue={''}
+                value={question}
                 onChange={handleChange}
+                onKeyDown={handleKeyDown}
+                onKeyUp={handleKeyUp}
+                ref={questionInput}
+                disabled={disabled}
               />
-            </div>
-          </div>
-
-          <button
-            type="button"
-            className="inline-flex items-center rounded-md border border-transparent bg-indigo-500 px-6 py-3 text-base font-medium text-white hover:bg-indigo-600 focus:outline-none mt-4 mb-4"
-            onClick={sendMessage}
-          >
-            {loading ?
-              <><div className="w-4 h-4 rounded-full animate-spin
-              border-2 border-solid border-white border-t-transparent"></div>&nbsp; Processing...</>
-            :
-              <><FaMagic/>&nbsp;Ask</>
-            }
-          </button>
-
-          <div className="rounded-md bg-yellow-50 p-4 mt-8">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <ExclamationTriangleIcon className="h-5 w-5 text-yellow-400" aria-hidden="true" />
-              </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-yellow-800">Attention needed</h3>
-                <div className="mt-2 text-sm text-yellow-700">
-                  <p>
-                    Answers are provided by a large language model. They are not always accurate and sometimes can be completely wrong. Don't take them too seriously.
-                  </p>
-                </div>
-              </div>
+              <button
+                type="button"
+                className={`inline-flex items-center text-white bg-gradient-to-r from-purple-500 to-pink-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center mt-4`}
+                onClick={sendMessage}
+                disabled={loading | !question}
+              >
+                {loading ?
+                  <><div className="w-4 h-4 rounded-full animate-spin
+                  border-2 border-solid border-white border-t-transparent"></div>&nbsp; Processing...</>
+                :
+                  <><FaMagic/>&nbsp;Ask</>
+                }
+              </button>
             </div>
           </div>
         </main>
