@@ -141,74 +141,70 @@ export default function Home() {
   ]
 
 	return (
-    <div className="bg-gray-900 mx-auto max-w-2xl px-4 sm:px-6 lg:px-8">
-        <main className="main">
-          <Alert />
-
-          <div className="overflow-auto scrollbar-hide" style={{maxHeight: '800px'}}>
-              {messages.map((message, i) =>
-                <>
-                  { message.sender === "you" &&
-                    <div className="mt-1 mb-5 block w-4/5 text-white bg-gradient-to-r from-purple-500 to-pink-500 font-medium rounded-lg text-sm px-5 py-2.5">
-                      <p>{message.text}</p>
-                    </div>
-                  }
-                  { message.sender === "bot" &&
-                    <div className="mt-1 mb-10 block w-4/5 ml-auto text-white bg-gradient-to-br from-pink-500 to-orange-400 font-medium rounded-lg text-sm px-5 py-2.5">
-                      <p className="answer leading-6">{<ReactMarkdown children={message.text} remarkPlugins={[remarkGfm]} />}</p>
-                    </div>
-                  }
-                </>
-              )}
-              {answer &&
-                <div className="mt-1 mb-10 block w-4/5 ml-auto text-white bg-gradient-to-br from-pink-500 to-orange-400 font-medium rounded-lg text-sm px-5 py-2.5">
-                  <p className="answer leading-6"><ReactMarkdown children={answer} remarkPlugins={[remarkGfm]} /></p>
+    <div className="bg-gray-900 mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 flex flex-col h-screen">
+      <Alert />
+      <div className="flex-1 overflow-auto scrollbar-hide">
+          {messages.map((message, i) =>
+            <>
+              { message.sender === "you" &&
+                <div className="mt-1 mb-5 block w-4/5 ml-auto text-white bg-gradient-to-r from-purple-500 to-pink-500 font-medium rounded-lg text-sm px-5 py-2.5">
+                  <p>{message.text}</p>
                 </div>
               }
-              <div className="mt-8" ref={messageHistory} />
-          </div>
-
-          <div className="fixed inset-x-0 bottom-8 mx-auto max-w-2xl">
-            <div className="mt-4">
-              <div className="flex mb-2">
-                <div className="text-gray-700 text-right mr-auto font-semibold text-xs sm:text-md">
-                  {isConnectionOpen ?
-                    <span className="text-green-500 inline-flex"><GiPlug />&nbsp;Connected</span>
-                  :
-                   <span className="text-gray-500 inline-flex"><GiUnplugged />&nbsp;Disconnected</span>
-                  }
+              { message.sender === "bot" &&
+                <div className="mt-1 mb-10 block w-4/5 text-white bg-gradient-to-br from-pink-500 to-orange-400 font-medium rounded-lg text-sm px-5 py-2.5">
+                  <p className="answer leading-6">{<ReactMarkdown children={message.text} remarkPlugins={[remarkGfm]} />}</p>
                 </div>
-                <div className="text-gray-400 text-right ml-auto font-semibold text-sm sm:text-md">{status}</div>
-              </div>
-              <textarea
-                rows={4}
-                name="question"
-                id="question"
-                className="block w-full rounded-md dark:bg-gray-800 border-gray-700 text-white focus:border-purple-500 focus:to-pink-500 focus:ring-purple-500 sm:text-sm"
-                defaultValue={''}
-                value={question}
-                onChange={handleChange}
-                onKeyDown={handleKeyDown}
-                onKeyUp={handleKeyUp}
-                ref={questionInput}
-                disabled={disabled}
-              />
-              <button
-                type="button"
-                className={`inline-flex items-center text-white bg-gradient-to-r from-purple-500 to-pink-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center mt-4`}
-                onClick={sendMessage}
-                disabled={loading | !question}
-              >
-                {loading ?
-                  <><div className="w-4 h-4 rounded-full animate-spin
-                  border-2 border-solid border-white border-t-transparent"></div>&nbsp; Processing...</>
-                :
-                  <><FaMagic/>&nbsp;Ask</>
-                }
-              </button>
+              }
+            </>
+          )}
+          {answer &&
+            <div className="mt-1 mb-10 block w-4/5 text-white bg-gradient-to-br from-pink-500 to-orange-400 font-medium rounded-lg text-sm px-5 py-2.5">
+              <p className="answer leading-6"><ReactMarkdown children={answer} remarkPlugins={[remarkGfm]} /></p>
             </div>
+          }
+          <div className="mt-20" ref={messageHistory} />
+      </div>
+
+      <div className="sticky inset-x-0 bottom-8 mt-10">
+        <div className="mt-4">
+          <div className="flex mb-2">
+            <div className="text-gray-700 text-right mr-auto font-semibold text-xs sm:text-md">
+              {isConnectionOpen ?
+                <span className="text-green-500 inline-flex"><GiPlug />&nbsp;Connected</span>
+              :
+              <span className="text-red-500 inline-flex"><GiUnplugged />&nbsp;Disconnected</span>
+              }
+            </div>
+            <div className="text-gray-400 text-right ml-auto font-semibold text-sm sm:text-md">{status}</div>
           </div>
-        </main>
+          <textarea
+            rows={1}
+            name="question"
+            id="question"
+            className="block w-full rounded-md dark:bg-gray-800 border-gray-700 text-white focus:border-purple-500 focus:to-pink-500 focus:ring-purple-500 sm:text-sm"
+            value={question}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
+            onKeyUp={handleKeyUp}
+            ref={questionInput}
+            disabled={disabled}
+          />
+          <button
+            type="button"
+            className={`inline-flex items-center text-white bg-gradient-to-r from-purple-500 to-pink-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center mt-4`}
+            onClick={sendMessage}
+            disabled={loading | !question}
+          >
+            {loading ?
+              <><div className="w-4 h-4 rounded-full animate-spin
+              border-2 border-solid border-white border-t-transparent"></div>&nbsp; Processing...</>
+            :
+              <><FaMagic/>&nbsp;Ask</>
+            }
+          </button>
+        </div>
+      </div>
     </div>
 	);
 }

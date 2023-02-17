@@ -4,6 +4,7 @@
 
 html {
     @apply bg-gray-900;
+    @apply scrollbar-hide;
 }
 .answer a {
     @apply text-gray-800;
