@@ -182,7 +182,7 @@ export default function Home() {
             rows={1}
             name="question"
             id="question"
-            className="block w-full rounded-md dark:bg-gray-800 border-gray-700 text-white focus:border-purple-500 focus:to-pink-500 focus:ring-purple-500 sm:text-sm"
+            className="block w-full rounded-md text-white bg-gray-800 border-gray-700  focus:border-purple-500 focus:to-pink-500 focus:ring-purple-500 sm:text-sm"
             value={question}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
